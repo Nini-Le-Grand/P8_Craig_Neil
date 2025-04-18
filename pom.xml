@@ -64,7 +64,12 @@
 			<artifactId>rewardCentral</artifactId>
 			<version>1.0.0</version>
 		</dependency>
-	</dependencies>
+        <dependency>
+            <groupId>com.vaadin.external.google</groupId>
+            <artifactId>android-json</artifactId>
+            <version>0.0.20131108.vaadin1</version>
+        </dependency>
+    </dependencies>
 
 	<build>
 		<plugins>

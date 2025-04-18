@@ -1,6 +1,7 @@
 package com.openclassrooms.tourguide.service;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
@@ -34,6 +35,10 @@ public class RewardsService {
 
 	public void setDefaultProximityBuffer() {
 		proximityBuffer = defaultProximityBuffer;
+	}
+
+	public int getAttractionRewardPoints(UUID attractionId, UUID userId) {
+		return rewardsCentral.getAttractionRewardPoints(attractionId, userId);
 	}
 
 	public void calculateRewards(User user) {
