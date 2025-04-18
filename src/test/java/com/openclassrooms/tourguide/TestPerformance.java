@@ -1,5 +1,6 @@
 package com.openclassrooms.tourguide;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
@@ -89,10 +90,11 @@ public class TestPerformance {
 		allUsers = tourGuideService.getAllUsers();
 		allUsers.forEach(u -> u.addToVisitedLocations(new VisitedLocation(u.getUserId(), attraction, new Date())));
 
-		allUsers.forEach(u -> rewardsService.calculateRewards(u));
+		allUsers.forEach(rewardsService::calculateRewards);
 
 		for (User user : allUsers) {
-			assertTrue(user.getUserRewards().size() > 0);
+            assertFalse(user.getUserRewards()
+                            .isEmpty());
 		}
 		stopWatch.stop();
 		tourGuideService.tracker.stopTracking();
