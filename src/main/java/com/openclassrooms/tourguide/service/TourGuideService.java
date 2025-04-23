@@ -8,6 +8,9 @@ import com.openclassrooms.tourguide.user.UserReward;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.IntStream;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -33,6 +36,7 @@ public class TourGuideService {
     private final TripPricer tripPricer = new TripPricer();
     public final Tracker tracker;
     boolean testMode = true;
+    private final ExecutorService executor = Executors.newFixedThreadPool(100); // Pool de threads
 
     public TourGuideService(GpsUtil gpsUtil, RewardsService rewardsService) {
         this.gpsUtil = gpsUtil;
@@ -55,10 +59,11 @@ public class TourGuideService {
     }
 
     public VisitedLocation getUserLocation(User user) {
-        return (!user.getVisitedLocations()
-                     .isEmpty()) ? user.getLastVisitedLocation() : trackUserLocation(user);
+        if (!user.getVisitedLocations().isEmpty()) {
+            return user.getLastVisitedLocation();
+        }
+        return trackUserLocation(user).join();
     }
-
     public User getUser(String userName) {
         return internalUserMap.get(userName);
     }
@@ -88,12 +93,17 @@ public class TourGuideService {
         return providers;
     }
 
-    public VisitedLocation trackUserLocation(User user) {
-        VisitedLocation visitedLocation = gpsUtil.getUserLocation(user.getUserId());
-        user.addToVisitedLocations(visitedLocation);
-        rewardsService.calculateRewards(user);
-        return visitedLocation;
-    }
+    public CompletableFuture<VisitedLocation> trackUserLocation(User user) {
+        return CompletableFuture.supplyAsync(() -> {
+                                    VisitedLocation visitedLocation = gpsUtil.getUserLocation(user.getUserId());
+                                    user.addToVisitedLocations(visitedLocation);
+                                    return visitedLocation;
+                                }, executor)
+                                .thenApply(visitedLocation -> {
+                                    rewardsService.calculateRewards(user);
+                                    return visitedLocation;
+                                });
+}
 
     public JSONObject getNearByAttractions(VisitedLocation visitedLocation) throws JSONException {
         List<Attraction> attractions = gpsUtil.getAttractions();
