@@ -117,7 +117,7 @@ public class TourGuideService {
 
         for (Attraction attraction : attractions) {
             double distance = rewardsService.getDistance(visitedLocation.location, attraction);
-            int rewardPoints = rewardsService.getAttractionRewardPoints(attraction.attractionId,visitedLocation.userId);
+            int rewardPoints = rewardsService.getRewardPoints(attraction,visitedLocation.userId);
 
             JSONObject attractionJson = new JSONObject();
             attractionJson.put("name", attraction.attractionName);
