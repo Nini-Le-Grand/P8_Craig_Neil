@@ -32,6 +32,6 @@ test:
 deploy:
   stage: deploy
   script:
-    - echo "Déploiement fictif (ex: mvn deploy ou scp target/*.jar)"
+    - echo "Déploiement fictif (mvn deploy)"
   only:
     - main
