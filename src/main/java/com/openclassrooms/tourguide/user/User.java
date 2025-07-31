@@ -69,6 +69,11 @@ public class User {
 		visitedLocations.clear();
 	}
 
+	/**
+	 * CHG NEILC
+	 * Adds a reward to the user's list of rewards
+	 * if a reward for the same attraction does not already exist
+	 */
 	public void addUserReward(UserReward userReward) {
 		if(userRewards.stream()
                       .noneMatch(r -> r.attraction.attractionName.equals(userReward.attraction.attractionName))) {

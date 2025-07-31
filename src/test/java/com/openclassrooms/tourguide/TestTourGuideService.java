@@ -24,6 +24,12 @@ import tripPricer.Provider;
 
 public class TestTourGuideService {
 
+	/**
+	 * Tests retrieving a user's location.
+	 * trackUserLocation is asynchronous and returns a CompletableFuture.
+	 * The join() method is used to wait for completion and get the VisitedLocation.
+	 * Verifies that the user ID in the visited location matches the user's ID.
+	 */
 	@Test
 	public void getUserLocation() {
 		GpsUtil gpsUtil = new GpsUtil();
@@ -97,6 +103,13 @@ public class TestTourGuideService {
 		assertEquals(user.getUserId(), allDoneVisitedLocation.userId);
 	}
 
+	/**
+	 * Tests retrieving nearby attractions for a given location.
+	 * The trackUserLocation method is asynchronous
+	 * join() waits for its completion
+	 * returns a JSONObject containing nearby attractions
+	 * Verifies that the number of nearby attractions returned is 5
+	 */
 	@Test
 	public void getNearbyAttractions() throws JSONException {
 		GpsUtil gpsUtil = new GpsUtil();

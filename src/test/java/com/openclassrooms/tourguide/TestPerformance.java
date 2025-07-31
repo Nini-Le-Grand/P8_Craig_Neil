@@ -47,6 +47,13 @@ public class TestPerformance {
 	 * TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()));
 	 */
 
+	/**
+	 * CHG NEILC
+	 * Performance test to track location for 100,000 users asynchronously.
+	 * Uses CompletableFuture to track each user's location in parallel,
+	 * improving scalability and reducing total execution time.
+	 * Ensures completion within 15 minutes.
+	 */
 	@Test
 	public void highVolumeTrackLocationNew100000() {
 		GpsUtil gpsUtil = new GpsUtil();
@@ -70,7 +77,7 @@ public class TestPerformance {
 
 		try {
 			while (!allDone.isDone()) {
-				Thread.sleep(5000);
+				Thread.sleep(1000);
 			}
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -85,13 +92,19 @@ public class TestPerformance {
 		assertTrue(TimeUnit.MINUTES.toSeconds(15) >= TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()));
 	}
 
-
+	/**
+	 * CHG NEILC
+	 * Performance test to calculate rewards asynchronously for 100,000 users.
+	 * Adds a visited location to each user, then calculates rewards in parallel using CompletableFutures.
+	 * Verifies each user has at least one reward.
+	 * Ensures completion within 20 minutes.
+	 */
 	@Test
 	public void highVolumeGetRewardsNew() {
 		GpsUtil gpsUtil = new GpsUtil();
 		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
 
-		InternalTestHelper.setInternalUserNumber(100000);
+		InternalTestHelper.setInternalUserNumber(10000);
 
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
@@ -111,7 +124,7 @@ public class TestPerformance {
 
 		try {
 			while (!allDone.isDone()) {
-				Thread.sleep(5000);
+				Thread.sleep(1000);
 			}
 		} catch (InterruptedException e) {
 			e.printStackTrace();

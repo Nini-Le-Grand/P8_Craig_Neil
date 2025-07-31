@@ -34,15 +34,11 @@ public class TourGuideController {
         return tourGuideService.getUserLocation(getUser(userName));
     }
 
-    //  TODO: Change this method to no longer return a List of Attractions.
-    //  Instead: Get the closest five tourist attractions to the user - no matter how far away they are.
-    //  Return a new JSON object that contains:
-    // Name of Tourist attraction, Ok
-    // Tourist attractions lat/long, Ok
-    // The user's location lat/long, Ok
-    // The distance in miles between the user's location and each of the attractions.
-    // The reward points for visiting each Attraction.
-    //    Note: Attraction reward points can be gathered from RewardsCentral
+    /**
+     * CHG NEILC
+     * Handles the GET request for nearby attractions for a given user.
+     * This method now throws JSONException if JSON construction fails.
+     */
     @RequestMapping("/getNearbyAttractions")
     public JSONObject getNearbyAttractions(@RequestParam String userName) throws JSONException {
         VisitedLocation visitedLocation = tourGuideService.getUserLocation(getUser(userName));

@@ -12,6 +12,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.IntStream;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -37,7 +38,13 @@ public class TourGuideService {
     private final TripPricer tripPricer = new TripPricer();
     public final Tracker tracker;
     boolean testMode = true;
-    private final ExecutorService executor = Executors.newFixedThreadPool(100); // Pool de threads
+
+    /**
+     * CHG NEILC
+     * ExecutorService with a fixed thread pool of 100 threads used to run asynchronous tasks concurrently,
+     * improving performance.
+     */
+    private final ExecutorService executor = Executors.newFixedThreadPool(100);
 
     public TourGuideService(GpsUtil gpsUtil, RewardsService rewardsService) {
         this.gpsUtil = gpsUtil;
@@ -55,16 +62,24 @@ public class TourGuideService {
         addShutDownHook();
     }
 
+
+
     public List<UserReward> getUserRewards(User user) {
         return user.getUserRewards();
     }
 
+    /**
+     * CHG NEILC
+     * Waits for the asynchronous user location tracking computation to complete.
+     */
     public VisitedLocation getUserLocation(User user) {
-        if (!user.getVisitedLocations().isEmpty()) {
+        if (!user.getVisitedLocations()
+                 .isEmpty()) {
             return user.getLastVisitedLocation();
         }
         return trackUserLocation(user).join();
     }
+
     public User getUser(String userName) {
         return internalUserMap.get(userName);
     }
@@ -94,6 +109,11 @@ public class TourGuideService {
         return providers;
     }
 
+    /**
+     * CHG NEILC
+     * Asynchronously tracks the user's location to avoid blocking the main thread.
+     * Returns a CompletableFuture containing the visited location once completed.
+     */
     public CompletableFuture<VisitedLocation> trackUserLocation(User user) {
         return CompletableFuture.supplyAsync(() -> {
                                     VisitedLocation visitedLocation = gpsUtil.getUserLocation(user.getUserId());
@@ -104,8 +124,14 @@ public class TourGuideService {
                                     rewardsService.calculateRewards(user);
                                     return visitedLocation;
                                 });
-}
+    }
 
+    /**
+     * CHG NEILC
+     * Retrieves the top 5 attractions closest to the user's visited location.
+     * The attractions are sorted by distance from the user.
+     * Returns a JSONObject containing the user's location and the nearby attractions details.
+     */
     public JSONObject getNearByAttractions(VisitedLocation visitedLocation) throws JSONException {
         List<Attraction> attractions = gpsUtil.getAttractions();
 
@@ -119,6 +145,12 @@ public class TourGuideService {
         return buildNearByAttractionsJSON(visitedLocation, nearByAttractions);
     }
 
+    /**
+     * CHG NEILC
+     * Builds a JSON response containing the user's current location and a list of nearby attractions.
+     * Each attraction in the list includes its name, location (latitude and longitude),
+     * distance from the user's location, and reward points available.
+     */
     private JSONObject buildNearByAttractionsJSON(VisitedLocation visitedLocation, List<Attraction> attractions) throws JSONException {
         JSONObject userLocationJson = new JSONObject();
         userLocationJson.put("latitude", visitedLocation.location.latitude);
@@ -128,7 +160,7 @@ public class TourGuideService {
 
         for (Attraction attraction : attractions) {
             double distance = rewardsService.getDistance(visitedLocation.location, attraction);
-            int rewardPoints = rewardsService.getRewardPoints(attraction,visitedLocation.userId);
+            int rewardPoints = rewardsService.getRewardPoints(attraction, visitedLocation.userId);
 
             JSONObject attractionJson = new JSONObject();
             attractionJson.put("name", attraction.attractionName);
